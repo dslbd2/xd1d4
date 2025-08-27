@@ -8,6 +8,9 @@ export default {
         'bengali': ['Noto Sans Bengali', 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
+        border: 'var(--border)',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
