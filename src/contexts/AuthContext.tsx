@@ -72,16 +72,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    // Demo mode authentication
+    if (email === 'demo@chamber.law' && password === 'demo123456') {
+      // Create a mock user session
+      const mockUser = {
+        id: 'demo-user-id',
+        email: 'demo@chamber.law',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      
+      const mockProfile = {
+        id: 'demo-user-id',
+        tenant_id: 'demo-tenant',
+        email: 'demo@chamber.law',
+        role: 'senior_lawyer' as const,
+        name: 'Demo User',
+        language: 'en' as const,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      
+      setUser(mockUser as any);
+      setUserProfile(mockProfile);
+      return;
+    }
+    
+    // Try real Supabase authentication
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+    } catch (error) {
+      // If Supabase fails, throw the original error
+      throw new Error('Invalid credentials. Please try demo@chamber.law / demo123456');
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    // Clear mock session
+    setUser(null);
+    setUserProfile(null);
+    
+    // Also try to sign out from Supabase if connected
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      // Ignore Supabase errors in demo mode
+      console.log('Supabase signOut skipped in demo mode');
+    }
   };
 
   const updateProfile = async (updates: Partial<User>) => {
